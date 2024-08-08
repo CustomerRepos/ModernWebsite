@@ -6,13 +6,12 @@ name: Contoso
     workflow_dispatch: {}
 env:
     ACR_RESOURCE_GROUP: contoso
-    AZURE_CONTAINER_REGISTRY: acrworkflow1723071329879
+    AZURE_CONTAINER_REGISTRY: acrworkflow1723140425285
     CLUSTER_NAME: contosoaks
     CLUSTER_RESOURCE_GROUP: contoso
-    CONTAINER_NAME: image-workflow-1723071329879
+    CONTAINER_NAME: image-workflow-1723140425285
     DEPLOYMENT_MANIFEST_PATH: |
-        manifests/deployment.yaml
-        manifests/service.yaml
+        ./storefront.yml
 jobs:
     buildImage:
         permissions:
@@ -28,7 +27,7 @@ jobs:
                 subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 tenant-id: ${{ secrets.AZURE_TENANT_ID }}
             - name: Build and push image to ACR
-              run: az acr build --image ${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f Dockerfile ./
+              run: az acr build --image ${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.ACR_RESOURCE_GROUP }} -f ./src/store-front/Dockerfile ./src/store-front
     deploy:
         permissions:
             actions: read
@@ -62,4 +61,4 @@ jobs:
                 action: deploy
                 images: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }}
                 manifests: ${{ env.DEPLOYMENT_MANIFEST_PATH }}
-                namespace: namespace-workflow-1723071329879
+                namespace: namespace-workflow-1723140425285
